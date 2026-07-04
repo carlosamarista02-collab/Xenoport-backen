@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from supabase import create_client, Client
 from typing import List, Optional
 import uvicorn
-# ✅ AGREGADO: Import necesario para permitir conexiones externas (CORS)
 from fastapi.middleware.cors import CORSMiddleware
 
 # ============ CONFIGURACIÓN ============
@@ -18,13 +17,12 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI(title="Xenoport API")
 
-# ============ CONFIGURACIÓN DE CORS (MUY IMPORTANTE) ============
-# Esto le dice al Backend que permita conexiones desde el Bot, el Juego (Netlify) y cualquier otro lado.
+# ============ CONFIGURACIÓN DE CORS ============
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permitir cualquier origen (dominio)
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, PUT, OPTIONS, etc.)
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -60,9 +58,12 @@ async def create_or_get_user(user: UserData):
         "telegram_name": user.telegram_name,
         "balance_usdt": 0.0,
         "balance_stars": 0.0,
-        "ships": [],
-        "aliens": [],
-        "fuel_available": 0
+        "ships": [],        # Arrays vacíos por defecto
+        "aliens": [],       # Arrays vacíos por defecto
+        "planets": [],      # Arrays vacíos por defecto
+        "fuel_available": 0,
+        "has_done_expedition": False,
+        "active_contract": None
     }
     insert_response = supabase.table('users').insert(new_user).execute()
     if insert_response.data:
