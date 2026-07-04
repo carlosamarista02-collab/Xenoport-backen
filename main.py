@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from supabase import create_client, Client
 from typing import List, Optional
 import uvicorn
+# ✅ AGREGADO: Import necesario para permitir conexiones externas (CORS)
+from fastapi.middleware.cors import CORSMiddleware
 
 # ============ CONFIGURACIÓN ============
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -15,6 +17,16 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI(title="Xenoport API")
+
+# ============ CONFIGURACIÓN DE CORS (MUY IMPORTANTE) ============
+# Esto le dice al Backend que permita conexiones desde el Bot, el Juego (Netlify) y cualquier otro lado.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir cualquier origen (dominio)
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, PUT, OPTIONS, etc.)
+    allow_headers=["*"],
+)
 
 # ============ MODELOS DE DATOS ============
 class UserData(BaseModel):
